@@ -53,6 +53,8 @@ conn = snowflake.connector.connect(
     
     # The corrected account identifier:
     account='zm35832.me-central2.gcp', 
+
+	https://www.sanfoundry.com/1000-python-questions-answers/
     
     warehouse='COMPUTE_WH',
     database='TESTDB',
