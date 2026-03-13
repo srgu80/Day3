@@ -1,0 +1,27 @@
+#creating warehouse
+CREATE OR REPLACE WAREHOUSE my_new_warehouse
+WITH 
+  WAREHOUSE_SIZE = 'X-SMALL' 
+  AUTO_SUSPEND = 300 
+  AUTO_RESUME = TRUE 
+  INITIALLY_SUSPENDED = TRUE
+  COMMENT = 'Warehouse for general data processing';
+  
+#db creation
+CREATE DATABASE IF NOT EXISTS my_new_database
+  DATA_RETENTION_TIME_IN_DAYS = 14
+  COMMENT = 'Primary database for production data';
+  
+#table creation
+create or replace TABLE TESTDB.PUBLIC.INCIDENTS (
+	NUMBER VARCHAR(50),
+	SHORT_DESCRIPTION VARCHAR(1000),
+	STATE VARCHAR(50),
+	PENDING_REASON VARCHAR(1000),
+	OPENED TIMESTAMP_NTZ(9),
+	OPENED_BY VARCHAR(255),
+	ASSIGNMENT_GROUP VARCHAR(255),
+	ASSIGNED_TO VARCHAR(255),
+	PRIORITY VARCHAR(50)
+)COMMENT='Table storing support ticket or incident records'
+#refer incidents.csv file
