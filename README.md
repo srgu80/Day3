@@ -25,3 +25,20 @@ create or replace TABLE TESTDB.PUBLIC.INCIDENTS (
 	PRIORITY VARCHAR(50)
 )COMMENT='Table storing support ticket or incident records'
 #refer incidents.csv file
+
+
+3. Installing Snowflake Connector
+Install using pip:
+	**pip install snowflake-connector-python**
+For Pandas integration:
+**pip install "snowflake-connector-python[pandas]"**
+Additional packages:
+pip install pandas
+________________________________________
+4. Importing Required Libraries
+Basic imports:
+import snowflake.connector
+For Pandas integration:
+import pandas as pd
+from snowflake.connector.pandas_tools import write_pandas
+
