@@ -42,3 +42,21 @@ For Pandas integration:
 import pandas as pd
 from snowflake.connector.pandas_tools import write_pandas
 
+
+Connection :
+
+import snowflake.connector
+
+conn = snowflake.connector.connect(
+    user='SRGU80',
+    password='setpass',
+    
+    # The corrected account identifier:
+    account='zm35832.me-central2.gcp', 
+    
+    warehouse='COMPUTE_WH',
+    database='TESTDB',
+    schema='public'
+)
+print("Connected successfully!")
+
