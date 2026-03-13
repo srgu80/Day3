@@ -1,0 +1,17 @@
+Number,Short description (Knowledge search),State,Pending reason,Opened,Opened by,Assignment group,Assigned to,Priority
+INC122333,Test1,Closed,,1/17/2022 19:38,User1 ,Group1,,4 - Low
+INC122445,Test3,Assigned,,1/21/2022 23:05,User2,Group2,,5 - Very Low
+INC274303,Test1,Pending,Awaiting User Info,1/20/2022 21:30,User3,Group3,,4 - Low
+INC267633,Test1,Pending,Awaiting User Info,1/21/2022 23:49,User3,Group8,,4 - Low
+INC264032,Test4,Pending,Awaiting User Info,1/21/2022 20:27,User3,Group4,,5 - Very Low
+INC262809,Test2,Closed,,1/15/2022 3:05,User2,Group9,,5 - Very Low
+INC266353,Test1,Pending,Awaiting User Info,1/20/2022 21:15,User2,Group5,,4 - Low
+INC263638,Test1,Assigned,,1/19/2022 22:23,User4,Group2,,4 - Low
+INC264053,Test1,Pending,Awaiting User Info,1/21/2022 22:26,User4,Group2,,4 - Low
+INC263413,Test2,Pending,Awaiting User Info,1/18/2022 19:13,User4,Group2,,5 - Very Low
+INC263401,Test2,Closed,,1/18/2022 17:25,User4,Group6,,5 - Very Low
+INC263108,Test5,Assigned,,1/16/2022 0:42,User1 ,Group7,,3 - Medium
+INC263316,Test6,Pending,Awaiting Problem,1/17/2022 0:44,User1 ,Group1,,4 - Low
+INC263189,Test7,Assigned,,1/18/2022 19:08,User1 ,Group1,,4 - Low
+INC264166,Test8,Assigned,,1/21/2022 21:56,User1 ,Group1,,4 - Low
+INC263091,Test9,Closed,,1/16/2022 18:07,User 3,Group7,,4 - Low
