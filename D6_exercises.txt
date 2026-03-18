@@ -141,3 +141,46 @@ SELECT
 
 FROM daily_sales
 ORDER BY product, sale_date;
+
+
+row number
+SELECT
+    txn_id,
+    customer_id,
+    txn_date,
+    amount,
+    ROW_NUMBER() OVER (
+        PARTITION BY customer_id, txn_date, amount
+        ORDER BY txn_id
+    ) AS rn
+FROM customer_transactions
+ORDER BY customer_id, txn_date, txn_id;
+
+subquery - removal of duplicates
+SELECT *
+FROM (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (
+            PARTITION BY customer_id, txn_date, amount
+            ORDER BY txn_id
+        ) AS rn
+    FROM customer_transactions
+) t
+WHERE rn = 1
+ORDER BY customer_id, txn_date;
+
+DELETE - change workbench settings uncheck safe mode in SQL editor
+DELETE FROM customer_transactions
+WHERE txn_id IN (
+    SELECT txn_id FROM (
+        SELECT
+            txn_id,
+            ROW_NUMBER() OVER (
+                PARTITION BY customer_id, txn_date, amount
+                ORDER BY txn_id
+            ) AS rn
+        FROM customer_transactions
+    ) x
+    WHERE rn > 1
+);
