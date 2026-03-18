@@ -1,0 +1,143 @@
+(1, "Alice", 50000, 10)
+(2, "Bob", 60000, 10)
+(3, "Charlie", 55000, 20)
+(4, "David", 45000, 20)
+(5, "Emma", 70000, 30)
+
+row number
+SELECT *
+FROM (
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY emp_id ORDER BY emp_name DESC) rn
+  FROM salary
+) t
+WHERE rn = 1;
+
+Rank
+SELECT *
+FROM (
+  SELECT salary, RANK() OVER (ORDER BY salary DESC) rnk
+  FROM salary
+) t
+WHERE rnk <= 3;
+
+dense rank
+SELECT *
+FROM (
+  SELECT *,
+    DENSE_RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC) dr
+  FROM salary
+) t
+WHERE dr = 2;
+
+Analytical windows:
+create table
+CREATE TABLE daily_sales (
+    sale_date DATE,
+    product VARCHAR(50),
+    amount INT
+);
+
+INSERT INTO daily_sales (sale_date, product, amount) VALUES
+('2024-01-01', 'Laptop', 1200),
+('2024-01-02', 'Laptop', 1500),
+('2024-01-03', 'Laptop', 900),
+('2024-01-04', 'Laptop', 1100),
+('2024-01-05', 'Laptop', 1600),
+('2024-01-01', 'Mobile', 800),
+('2024-01-02', 'Mobile', 950),
+('2024-01-03', 'Mobile', 700),
+('2024-01-04', 'Mobile', 850),
+('2024-01-05', 'Mobile', 1000);
+
+unning total
+SELECT 
+    product,
+    sale_date,
+    amount,
+    SUM(amount) OVER (
+        PARTITION BY product
+        ORDER BY sale_date
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS running_total
+FROM daily_sales
+ORDER BY product, sale_date;
+
+3 day average
+SELECT
+    product,
+    sale_date,
+    amount,
+    AVG(amount) OVER (
+        PARTITION BY product
+        ORDER BY sale_date
+        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ) AS moving_avg_3day
+FROM daily_sales
+ORDER BY product, sale_date;
+
+LAG
+SELECT
+    product,
+    sale_date,
+    amount,
+    LAG(amount, 1) OVER (
+        PARTITION BY product
+        ORDER BY sale_date
+    ) AS prev_day_sales,
+    amount - LAG(amount, 1) OVER (
+        PARTITION BY product
+        ORDER BY sale_date
+    ) AS day_change
+FROM daily_sales
+ORDER BY product, sale_date;
+
+Lead
+SELECT
+    product,
+    sale_date,
+    amount,
+    LEAD(amount, 1) OVER (
+        PARTITION BY product
+        ORDER BY sale_date
+    ) AS next_day_sales,
+    LEAD(amount, 1) OVER (
+        PARTITION BY product
+        ORDER BY sale_date
+    ) - amount AS next_day_change
+FROM daily_sales
+ORDER BY product, sale_date;
+
+CAPASTONE:
+
+SELECT
+    product,
+    sale_date,
+    amount,
+
+    -- Running total
+    SUM(amount) OVER (
+        PARTITION BY product
+        ORDER BY sale_date
+    ) AS running_total,
+
+    -- Moving average (3 days)
+    AVG(amount) OVER (
+        PARTITION BY product
+        ORDER BY sale_date
+        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ) AS moving_avg_3day,
+
+    -- Previous day
+    LAG(amount) OVER (
+        PARTITION BY product
+        ORDER BY sale_date
+    ) AS prev_day,
+
+    -- Next day
+    LEAD(amount) OVER (
+        PARTITION BY product
+        ORDER BY sale_date
+    ) AS next_day
+
+FROM daily_sales
+ORDER BY product, sale_date;
