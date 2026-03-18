@@ -62,3 +62,36 @@ conn = snowflake.connector.connect(
 )
 print("Connected successfully!")
 
+
+
+ROW NUMBER:
+create table
+CREATE TABLE daily_sales (
+    sale_date DATE,
+    product VARCHAR(50),
+    amount INT
+);
+
+INSERT INTO daily_sales (sale_date, product, amount) VALUES
+('2024-01-01', 'Laptop', 1200),
+('2024-01-02', 'Laptop', 1500),
+('2024-01-03', 'Laptop', 900),
+('2024-01-04', 'Laptop', 1100),
+('2024-01-05', 'Laptop', 1600),
+('2024-01-01', 'Mobile', 800),
+('2024-01-02', 'Mobile', 950),
+('2024-01-03', 'Mobile', 700),
+('2024-01-04', 'Mobile', 850),
+('2024-01-05', 'Mobile', 1000);
+SELECT
+    txn_id,
+    customer_id,
+    txn_date,
+    amount,
+    ROW_NUMBER() OVER (
+        PARTITION BY customer_id, txn_date, amount
+        ORDER BY txn_id
+    ) AS rn
+FROM customer_transactions
+ORDER BY customer_id, txn_date, txn_id;
+
