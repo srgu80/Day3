@@ -1,0 +1,617 @@
+Here you go, Srinivasa — a **complete, from‑scratch, trainer‑ready, deeply detailed module** on **Semi‑Structured Data & JSON Storage Concepts in Relational Databases**.  
+This is written exactly in the style you prefer: **clear, structured, industry‑aligned, and hands‑on**, suitable for DevOps/Data/Cloud learners.
+
+---
+
+# ⭐ **SEMI‑STRUCTURED DATA: JSON STORAGE IN RELATIONAL SYSTEMS**  
+A complete foundational + advanced notes package.
+
+---
+
+# 🟦 **1. What Is Semi‑Structured Data?**
+
+Semi‑structured data is **not fully tabular**, but it still has **some organizational structure** such as:
+
+- key–value pairs  
+- nested objects  
+- arrays  
+- flexible schema  
+
+### Examples:
+- JSON  
+- XML  
+- YAML  
+- Avro  
+- Parquet (schema‑on‑read)  
+
+### Why it matters:
+Modern applications (APIs, microservices, logs, events, IoT) generate **JSON‑based data**, and relational systems must store and query it efficiently.
+
+---
+
+# 🟦 **2. Why Store JSON in Relational Databases?**
+
+Relational systems (MySQL, PostgreSQL, SQL Server, Oracle) now support JSON because:
+
+- Microservices exchange JSON payloads  
+- Event‑driven systems store logs in JSON  
+- Cloud apps (AWS/Azure) use JSON for config/state  
+- Data lakes ingest JSON before ETL  
+- Flexible schema reduces friction during ingestion  
+
+**Hybrid workloads** need both:
+- relational consistency  
+- semi‑structured flexibility  
+
+---
+
+# 🟦 **3. JSON Storage Options in RDBMS**
+
+### **A. Store JSON as TEXT/VARCHAR**
+- Simple  
+- No validation  
+- No indexing  
+- Slow for querying  
+
+### **B. Store JSON in Native JSON Column Type**
+Supported in:
+- MySQL  
+- PostgreSQL  
+- SQL Server (JSON functions only)  
+- Oracle (JSON data type in 21c+)  
+
+**Benefits:**
+- Validation  
+- Indexing  
+- Efficient storage  
+- JSON functions for querying  
+
+---
+
+# 🟦 **4. Creating a JSON Table (MySQL Example)**
+
+```sql
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_data JSON
+);
+```
+
+Insert JSON:
+
+```sql
+INSERT INTO orders VALUES
+(1, 101, '{"items":[{"product":"Laptop","qty":1}], "total":1200, "status":"shipped"}'),
+(2, 102, '{"items":[{"product":"Mobile","qty":2}], "total":1500, "status":"processing"}');
+```
+
+---
+
+# 🟦 **5. Querying JSON Data**
+
+### **Extract a JSON field**
+```sql
+SELECT 
+    order_id,
+    order_data->'$.status' AS status
+FROM orders;
+```
+
+### **Extract nested values**
+```sql
+SELECT
+    order_id,
+    order_data->'$.items[0].product' AS first_product
+FROM orders;
+```
+
+### **Using JSON_EXTRACT**
+```sql
+SELECT
+    JSON_EXTRACT(order_data, '$.total') AS total_amount
+FROM orders;
+```
+
+---
+
+# 🟦 **6. Updating JSON Fields**
+
+```sql
+UPDATE orders
+SET order_data = JSON_SET(order_data, '$.status', 'delivered')
+WHERE order_id = 2;
+```
+
+---
+
+# 🟦 **7. Searching Inside JSON**
+
+### Find orders where product = 'Laptop'
+
+```sql
+SELECT *
+FROM orders
+WHERE JSON_SEARCH(order_data, 'one', 'Laptop') IS NOT NULL;
+```
+
+---
+
+# 🟦 **8. JSON Indexing (Performance Optimization)**
+
+### **Generated Column + Index**
+```sql
+ALTER TABLE orders
+ADD total_amount INT 
+    GENERATED ALWAYS AS (JSON_EXTRACT(order_data, '$.total')) STORED;
+
+CREATE INDEX idx_total_amount ON orders(total_amount);
+```
+
+This makes JSON queries **fast and index‑friendly**.
+
+---
+
+# 🟦 **9. JSON Validation**
+
+### Check if JSON is valid
+```sql
+SELECT JSON_VALID(order_data) FROM orders;
+```
+
+### Reject invalid JSON on insert
+MySQL JSON column automatically enforces this.
+
+---
+
+# 🟦 **10. JSON vs Relational Columns — When to Use What**
+
+| Use Case | JSON | Relational |
+|----------|------|------------|
+| Flexible schema | ✅ | ❌ |
+| Strict schema | ❌ | ✅ |
+| Complex nested data | ✅ | ❌ |
+| High‑performance joins | ❌ | ✅ |
+| API payload storage | ✅ | ❌ |
+| Reporting/analytics | ❌ | ✅ |
+
+**Rule of thumb:**  
+Use JSON for **flexible attributes**, relational columns for **core business fields**.
+
+---
+
+# 🟦 **11. Real‑World Example (BFSI)**  
+### Storing KYC metadata in JSON:
+
+```sql
+{
+  "kyc_type": "passport",
+  "issued_country": "IN",
+  "expiry_date": "2030-05-01",
+  "verification": {
+      "status": "verified",
+      "verified_by": "system",
+      "timestamp": "2024-01-10T10:30:00Z"
+  }
+}
+```
+
+Relational systems store:
+- customer_id  
+- kyc_status  
+- kyc_json (full payload)  
+
+This supports:
+- regulatory audits  
+- flexible schema changes  
+- API‑driven ingestion  
+
+---
+
+# 🟦 **12. JSON Functions Cheat Sheet (MySQL)**
+
+| Function | Purpose |
+|----------|----------|
+| `JSON_EXTRACT` | Read JSON value |
+| `JSON_SET` | Update JSON |
+| `JSON_REPLACE` | Replace JSON value |
+| `JSON_REMOVE` | Delete JSON key |
+| `JSON_ARRAY` | Create JSON array |
+| `JSON_OBJECT` | Create JSON object |
+| `JSON_SEARCH` | Search inside JSON |
+| `JSON_VALID` | Validate JSON |
+
+---
+
+# 🟦 **13. Full Hands‑On Exercise (Capstone)**  
+### **Goal:** Build a customer_orders table with JSON, extract fields, index them, and run analytics.
+
+---
+
+## **Step 1 — Create Table**
+
+```sql
+CREATE TABLE customer_orders (
+    id INT PRIMARY KEY,
+    customer_id INT,
+    order_json JSON
+);
+```
+
+---
+
+## **Step 2 — Insert JSON Data**
+
+```sql
+INSERT INTO customer_orders VALUES
+(1, 101, '{"order_date":"2024-01-01","items":[{"p":"Laptop","q":1}],"total":1200}'),
+(2, 101, '{"order_date":"2024-01-05","items":[{"p":"Mouse","q":2}],"total":200}'),
+(3, 102, '{"order_date":"2024-01-03","items":[{"p":"Mobile","q":1}],"total":900}');
+```
+
+---
+
+## **Step 3 — Extract Fields**
+
+```sql
+SELECT
+    id,
+    order_json->'$.order_date' AS order_date,
+    order_json->'$.total' AS total
+FROM customer_orders;
+```
+
+---
+
+## **Step 4 — Create Generated Column + Index**
+
+```sql
+ALTER TABLE customer_orders
+ADD total_amount INT GENERATED ALWAYS AS (order_json->'$.total') STORED;
+
+CREATE INDEX idx_total_amount ON customer_orders(total_amount);
+```
+
+---
+
+## **Step 5 — Query Using Index**
+
+```sql
+SELECT *
+FROM customer_orders
+WHERE total_amount > 500;
+```
+
+---
+
+## **Step 6 — Update JSON**
+
+```sql
+UPDATE customer_orders
+SET order_json = JSON_SET(order_json, '$.status', 'completed')
+WHERE id = 1;
+```
+
+---
+
+# 🟦 **14. Hands‑On Exercises for Learners**
+
+### **Exercise 1**  
+Create a table with JSON column storing employee skills.
+
+### **Exercise 2**  
+Extract nested JSON fields using JSON_EXTRACT.
+
+### **Exercise 3**  
+Update JSON to add a new key (e.g., certification).
+
+### **Exercise 4**  
+Create a generated column from JSON and index it.
+
+### **Exercise 5**  
+Search JSON for a specific value.
+
+### **Exercise 6**  
+Validate JSON and reject invalid rows.
+
+### **Exercise 7**  
+Build a reporting query combining relational + JSON fields.
+
+---
+
+# ⭐ If you want, I can also prepare:
+- A **JSON vs XML comparison module**  
+- A **20‑exercise JSON SQL workbook**  
+- A **Databricks/Spark JSON ingestion module**  
+- A **BFSI case study: Storing regulatory metadata in JSON**  
+
+Just tell me what direction you want to take next.
+.
+
+---
+
+# ⭐ **NESTED DATA PARSING: Extracting Nested Fields & Flattening Arrays**  
+A full hands‑on module starting from raw JSON → extraction → flattening → analytics.
+
+---
+
+# 🟦 **1. Create Source Table (Intentionally Nested JSON + Arrays)**  
+We’ll build a realistic e‑commerce dataset.
+
+```sql
+CREATE TABLE orders_json (
+    order_id INT,
+    customer_id INT,
+    order_payload JSON
+);
+
+INSERT INTO orders_json VALUES
+(1, 101,
+ '{
+    "order_date": "2024-01-01",
+    "shipping": {"city": "Bengaluru", "pincode": 560001},
+    "items": [
+        {"product": "Laptop", "qty": 1, "price": 1200},
+        {"product": "Mouse", "qty": 2, "price": 50}
+    ],
+    "payment": {"mode": "UPI", "status": "success"}
+ }'),
+
+(2, 102,
+ '{
+    "order_date": "2024-01-03",
+    "shipping": {"city": "Hyderabad", "pincode": 500001},
+    "items": [
+        {"product": "Mobile", "qty": 1, "price": 900}
+    ],
+    "payment": {"mode": "Card", "status": "pending"}
+ }');
+```
+
+This dataset includes:
+- nested objects (`shipping`, `payment`)  
+- arrays (`items`)  
+- mixed data types  
+
+Perfect for nested parsing exercises.
+
+---
+
+# 🟦 **2. Extract Simple Nested Fields (JSON_EXTRACT)**
+
+### **Goal:** Extract order_date, city, payment mode.
+
+```sql
+SELECT
+    order_id,
+    JSON_EXTRACT(order_payload, '$.order_date') AS order_date,
+    JSON_EXTRACT(order_payload, '$.shipping.city') AS city,
+    JSON_EXTRACT(order_payload, '$.payment.mode') AS payment_mode
+FROM orders_json;
+```
+
+### What learners observe  
+- Dot notation for nested objects  
+- JSON paths (`$.field.subfield`)  
+
+---
+
+# 🟦 **3. Extract Nested Fields Using Arrow Operator (→)**  
+(MySQL shorthand)
+
+```sql
+SELECT
+    order_id,
+    order_payload->'$.shipping.pincode' AS pincode,
+    order_payload->'$.payment.status' AS payment_status
+FROM orders_json;
+```
+
+---
+
+# 🟦 **4. Extract Array Elements (items[0], items[1])**
+
+### **Goal:** Extract first product in the array.
+
+```sql
+SELECT
+    order_id,
+    order_payload->'$.items[0].product' AS first_product,
+    order_payload->'$.items[0].qty' AS first_qty
+FROM orders_json;
+```
+
+---
+
+# 🟦 **5. Count Items in Array (JSON_LENGTH)**
+
+```sql
+SELECT
+    order_id,
+    JSON_LENGTH(order_payload->'$.items') AS item_count
+FROM orders_json;
+```
+
+---
+
+# 🟦 **6. Flatten Arrays Using JSON_TABLE (MySQL 8+)**  
+This is the **most important transformation** for real‑world pipelines.
+
+### **Goal:** Convert each item in the array into its own row.
+
+```sql
+SELECT
+    o.order_id,
+    o.customer_id,
+    jt.product,
+    jt.qty,
+    jt.price
+FROM orders_json o,
+JSON_TABLE(
+    o.order_payload,
+    '$.items[*]' 
+    COLUMNS (
+        product VARCHAR(50) PATH '$.product',
+        qty INT PATH '$.qty',
+        price INT PATH '$.price'
+    )
+) AS jt;
+```
+
+### What learners observe  
+- `JSON_TABLE` expands arrays into rows  
+- Each array element becomes a row  
+- Perfect for analytics, reporting, ETL  
+
+---
+
+# 🟦 **7. Flatten + Join With Parent Fields**
+
+```sql
+SELECT
+    o.order_id,
+    o.customer_id,
+    o.order_payload->'$.order_date' AS order_date,
+    jt.product,
+    jt.qty,
+    jt.price,
+    (jt.qty * jt.price) AS line_total
+FROM orders_json o,
+JSON_TABLE(
+    o.order_payload,
+    '$.items[*]'
+    COLUMNS (
+        product VARCHAR(50) PATH '$.product',
+        qty INT PATH '$.qty',
+        price INT PATH '$.price'
+    )
+) jt;
+```
+
+---
+
+# 🟦 **8. Extract Deeply Nested Fields**
+
+Let’s add a nested payment object:
+
+```sql
+order_payload->'$.payment.status'
+order_payload->'$.payment.mode'
+order_payload->'$.shipping.city'
+order_payload->'$.shipping.pincode'
+```
+
+### Example:
+
+```sql
+SELECT
+    order_id,
+    order_payload->'$.payment.status' AS payment_status,
+    order_payload->'$.shipping.city' AS city
+FROM orders_json;
+```
+
+---
+
+# 🟦 **9. Search Inside Nested JSON (JSON_SEARCH)**
+
+### Find orders where any item has product = 'Laptop'
+
+```sql
+SELECT *
+FROM orders_json
+WHERE JSON_SEARCH(order_payload, 'one', 'Laptop') IS NOT NULL;
+```
+
+---
+
+# 🟦 **10. Update Nested JSON Fields (JSON_SET)**
+
+### Update payment status
+
+```sql
+UPDATE orders_json
+SET order_payload = JSON_SET(order_payload, '$.payment.status', 'completed')
+WHERE order_id = 2;
+```
+
+---
+
+# 🟦 **11. Add New Nested Field**
+
+```sql
+UPDATE orders_json
+SET order_payload = JSON_SET(order_payload, '$.delivery.eta', '2024-01-10')
+WHERE order_id = 1;
+```
+
+---
+
+# 🟦 **12. Full Flattening Pipeline (Capstone Exercise)**  
+### **Goal:** Produce a fully flattened order_items table.
+
+```sql
+SELECT
+    o.order_id,
+    o.customer_id,
+    o.order_payload->'$.order_date' AS order_date,
+    o.order_payload->'$.shipping.city' AS city,
+    jt.product,
+    jt.qty,
+    jt.price,
+    (jt.qty * jt.price) AS line_total,
+    o.order_payload->'$.payment.mode' AS payment_mode,
+    o.order_payload->'$.payment.status' AS payment_status
+FROM orders_json o,
+JSON_TABLE(
+    o.order_payload,
+    '$.items[*]'
+    COLUMNS (
+        product VARCHAR(50) PATH '$.product',
+        qty INT PATH '$.qty',
+        price INT PATH '$.price'
+    )
+) jt;
+```
+
+This produces a **fully normalized, analytics‑ready dataset**.
+
+---
+
+# 🟦 **13. Hands‑On Exercises for Learners**
+
+### **Exercise 1 — Extract Nested Fields**
+Extract:
+- order_date  
+- shipping city  
+- payment mode  
+
+### **Exercise 2 — Extract Array Elements**
+Extract first item’s product and qty.
+
+### **Exercise 3 — Count Array Elements**
+Count number of items per order.
+
+### **Exercise 4 — Flatten Arrays**
+Use JSON_TABLE to flatten items.
+
+### **Exercise 5 — Add New Nested Field**
+Add `"priority": "high"` to each order.
+
+### **Exercise 6 — Update Nested Field**
+Change payment status to `"success"`.
+
+### **Exercise 7 — Build Flattened Table**
+Create `order_items_flat` using JSON_TABLE.
+
+---
+
+# ⭐ Want the next module?  
+I can prepare:
+
+- **Advanced JSON_TABLE with CROSS JOIN + UNNEST**  
+- **Spark/Databricks nested JSON flattening**  
+- **BFSI case study: Parsing nested KYC/AML JSON**  
+- **20‑exercise workbook for nested JSON**  
+
+Just tell me what direction you want to take next.
