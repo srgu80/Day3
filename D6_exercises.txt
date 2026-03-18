@@ -184,3 +184,42 @@ WHERE txn_id IN (
     ) x
     WHERE rn > 1
 );
+
+Advanced Transformation - String and Text extarction 
+CREATE TABLE employee_raw (
+    emp_id INT,
+    full_name VARCHAR(100),
+    email VARCHAR(100),
+    join_date VARCHAR(20),
+    salary VARCHAR(20),
+    department VARCHAR(50)
+);
+
+INSERT INTO employee_raw VALUES
+(1, '  Alice Johnson ', 'ALICE.JOHNSON@COMPANY.COM ', '2024/01/05', ' 50000 ', 'Technology'),
+(2, 'bob  miller', 'bob.miller@company.com', '05-01-2024', '60000', 'technology'),
+(3, 'CHARLIE   BROWN', 'charlie.brown@company.com', '2024.01.07', '55000', 'Finance'),
+(4, 'david smith', 'DAVID.SMITH@COMPANY.COM', '07/01/2024', ' 45000', 'finance'),
+(5, 'Emma  Wilson', 'emma.wilson@company.com', '2024-01-10', '70000 ', 'Technology');
+
+clean names
+SELECT
+    CONCAT(
+        UPPER(SUBSTRING(TRIM(full_name), 1, 1)),
+        LOWER(SUBSTRING(TRIM(full_name), 2))
+    ) AS proper_case_name
+FROM employee_raw;
+
+validate - CASE statement covered here
+SELECT
+    email,
+    LOWER(TRIM(email)) AS normalized_email,
+    CASE 
+        WHEN email LIKE '%@%.%' THEN 'VALID'
+        ELSE 'INVALID'
+    END AS email_status
+FROM employee_raw;
+
+
+
+
