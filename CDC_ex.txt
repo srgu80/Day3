@@ -96,6 +96,38 @@ SELECT * FROM customers_cdc ORDER BY cdc_id;
 You will see something like:
 
 | cdc_id | customer_id | name   | city       | operation_type | timestamp |
+
+scheduling - yesterday's transactions
+CREATE TABLE Transactions (
+    TxnID INT PRIMARY KEY,
+    CustID INT,
+    Amount DECIMAL(12,2),
+    TxnDate DATETIME,
+    TxnType VARCHAR(20),
+    Channel VARCHAR(20),
+    LastUpdated DATETIME
+);
+CREATE TABLE Transactions_Staging (
+    TxnID INT,
+    CustID INT,
+    Amount DECIMAL(12,2),
+    TxnDate DATETIME,
+    TxnType VARCHAR(20),
+    Channel VARCHAR(20),
+    LastUpdated DATETIME
+);
+INSERT INTO Transactions VALUES
+(1001, 1, 2500.00, NOW() - INTERVAL 1 DAY, 'DEBIT', 'ATM', NOW() - INTERVAL 1 DAY),
+(1002, 1, 5000.00, NOW() - INTERVAL 2 DAY, 'CREDIT', 'ONLINE', NOW() - INTERVAL 2 DAY),
+(1003, 2, 1200.00, NOW(), 'DEBIT', 'POS', NOW()),
+(1004, 3, 750.00, NOW() - INTERVAL 1 DAY, 'DEBIT', 'UPI', NOW() - INTERVAL 1 DAY),
+(1005, 3, 9000.00, NOW() - INTERVAL 3 DAY, 'CREDIT', 'BRANCH', NOW() - INTERVAL 3 DAY);
+SELECT * FROM Transactions;
+SELECT *
+FROM Transactions
+WHERE TxnDate >= CURDATE() - INTERVAL 1 DAY
+  AND TxnDate < CURDATE();
+
 |--------|-------------|--------|------------|----------------|-----------|
 | 1      | 4           | David  | Pune       | INSERT         | …         |
 | 2      | 1           | Alice  | Bengaluru  | UPDATE         | …         |
