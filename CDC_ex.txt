@@ -1,0 +1,103 @@
+
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    city VARCHAR(100),
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+Insert initial data:
+
+```sql
+INSERT INTO customers VALUES
+(1, 'Alice', 'Mumbai', NOW()),
+(2, 'Bob', 'Delhi', NOW()),
+(3, 'Charlie', 'Chennai', NOW());
+```
+
+---
+
+# 🗂️ **2. Create a CDC Table (Change Log)**  
+
+CREATE TABLE customers_cdc (
+    cdc_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT,
+    customer_name VARCHAR(100),
+    city VARCHAR(100),
+    operation_type ENUM('INSERT','UPDATE','DELETE'),
+    operation_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+3. Create CDC Triggers**
+
+## **A. INSERT Trigger**
+
+```sql
+CREATE TRIGGER trg_customers_insert
+AFTER INSERT ON customers
+FOR EACH ROW
+INSERT INTO customers_cdc (customer_id, customer_name, city, operation_type)
+VALUES (NEW.customer_id, NEW.customer_name, NEW.city, 'INSERT');
+```
+
+## **B. UPDATE Trigger**
+
+```sql
+CREATE TRIGGER trg_customers_update
+AFTER UPDATE ON customers
+FOR EACH ROW
+INSERT INTO customers_cdc (customer_id, customer_name, city, operation_type)
+VALUES (NEW.customer_id, NEW.customer_name, NEW.city, 'UPDATE');
+```
+
+## **C. DELETE Trigger**
+
+```sql
+CREATE TRIGGER trg_customers_delete
+AFTER DELETE ON customers
+FOR EACH ROW
+INSERT INTO customers_cdc (customer_id, customer_name, city, operation_type)
+VALUES (OLD.customer_id, OLD.customer_name, OLD.city, 'DELETE');
+```
+
+---
+
+# 🧪 **4. Test the CDC Flow**
+
+### **Insert a new customer**
+```sql
+INSERT INTO customers VALUES (4, 'David', 'Pune', NOW());
+```
+
+### **Update an existing customer**
+```sql
+UPDATE customers
+SET city = 'Bengaluru'
+WHERE customer_id = 1;
+```
+
+### **Delete a customer**
+```sql
+DELETE FROM customers WHERE customer_id = 2;
+```
+
+---
+
+# 📊 **5. View the CDC Log**
+
+```sql
+SELECT * FROM customers_cdc ORDER BY cdc_id;
+```
+
+You will see something like:
+
+| cdc_id | customer_id | name   | city       | operation_type | timestamp |
+|--------|-------------|--------|------------|----------------|-----------|
+| 1      | 4           | David  | Pune       | INSERT         | …         |
+| 2      | 1           | Alice  | Bengaluru  | UPDATE         | …         |
+| 3      | 2           | Bob    | Delhi      | DELETE         | …         |
+
