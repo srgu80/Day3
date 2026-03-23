@@ -1,3 +1,49 @@
+CREATE TABLE incidents (
+    number              VARCHAR(20) PRIMARY KEY,
+    short_description   VARCHAR(255),
+    state               VARCHAR(50),
+    pending_reason      VARCHAR(100),
+    opened              DATETIME NULL,
+    opened_by           VARCHAR(100) NULL,
+    assignment_group    VARCHAR(100),
+    assigned_to         VARCHAR(100) NULL,
+    priority            VARCHAR(20)
+);
+SHOW VARIABLES LIKE 'secure_file_priv'
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/inc.csv'
+INTO TABLE incidents
+FIELDS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(number,
+ short_description,
+ state,
+ pending_reason,
+ @opened,
+ @opened_by,
+ assignment_group,
+ @assigned_to,
+ priority)
+SET
+ opened     = NULLIF(@opened, 'null'),
+ opened_by  = NULLIF(@opened_by, 'null'),
+ assigned_to = NULLIF(@assigned_to, 'null');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #creating warehouse
 CREATE OR REPLACE WAREHOUSE my_new_warehouse
 WITH 
